@@ -2,7 +2,7 @@
 # One-shot: seed labels, milestones, and a starter issue set.
 # Run from the repo root, after the repo exists and gh is authenticated.
 #
-# shellcheck disable=SC2016  # backticks in the issue bodies are literal markdown
+# shellcheck disable=SC2016,SC2046  # literal backticks in issue bodies; intentional word splitting of issue-number lists
 set -e
 
 REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
@@ -150,4 +150,27 @@ issue 'M5.2 — Store page text' 'M5 — Ship' 'design' \
 
 Done when: the store text is ready to paste.'
 
-echo "Backlog seeded: 22 issues across 6 milestones."
+# --- wire the ready/blocked invariant ---------------------------------
+# Gate = the last-created issue of each milestone; the next milestone is
+# blocked by it. The first milestone is the ready set (with Start here).
+msnums() {
+  gh issue list --state all --milestone "$1" --limit 100 --json number --jq '.[].number'
+}
+gate() {
+  gh issue list --state all --milestone "$1" --limit 100 --json number --jq '.[0].number'
+}
+
+g0=$(gate "M0 — Setup & first window")
+g1=$(gate "M1 — Core loop")
+g2=$(gate "M2 — Progression")
+g3=$(gate "M3 — Saving")
+g4=$(gate "M4 — Feel & polish")
+
+gh issue edit $(msnums "M0 — Setup & first window") --add-label ready >/dev/null
+gh issue edit $(msnums "M1 — Core loop") --add-blocked-by "$g0" >/dev/null
+gh issue edit $(msnums "M2 — Progression") --add-blocked-by "$g1" >/dev/null
+gh issue edit $(msnums "M3 — Saving") --add-blocked-by "$g2" >/dev/null
+gh issue edit $(msnums "M4 — Feel & polish") --add-blocked-by "$g3" >/dev/null
+gh issue edit $(msnums "M5 — Ship") --add-blocked-by "$g4" >/dev/null
+
+echo "Backlog seeded: 22 issues across 6 milestones — ready set labeled, milestone gates wired."
