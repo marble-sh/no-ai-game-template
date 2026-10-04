@@ -8,6 +8,13 @@ set -e
 REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
 echo "Seeding backlog for $REPO"
 
+# Turn on the shipped pre-commit format hook for this clone (local config only).
+if git config core.hooksPath .githooks 2>/dev/null; then
+  echo "Format hook enabled (.githooks): staged C files are formatted on commit."
+else
+  echo "note: could not enable the format hook — run: git config core.hooksPath .githooks"
+fi
+
 # --- labels -----------------------------------------------------------
 gh label create setup    --color fbca04 --force --description "Environment and setup work"
 gh label create learning --color 5319e7 --force --description "Skill building, not shipping"

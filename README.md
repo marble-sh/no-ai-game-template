@@ -49,6 +49,10 @@ off for Zed, VS Code, Vim/Neovim, and Emacs.
        sh scripts/setup-backlog.sh
        sh scripts/setup-board.sh
 
+   The first script also enables the shipped pre-commit format hook for your
+   clone (`core.hooksPath=.githooks`) — staged C files are clang-formatted on
+   every commit.
+
 3. **Open it in your editor.** Accept the trust prompts once (Zed / Emacs). If you
    use Vim/Neovim, enable `exrc` to pick up the AI-off settings.
 4. `make run` — get a window on screen, then start your first issue.
