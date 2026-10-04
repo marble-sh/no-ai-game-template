@@ -25,8 +25,13 @@ gh project field-create "$NUM" --owner "$OWNER" --name "Priority" --data-type SI
 gh project field-create "$NUM" --owner "$OWNER" --name "Due" --data-type DATE >/dev/null
 
 echo "Adding issues to the board ..."
+sleep 5 # give the search index a moment to catch up with the seeded backlog
 gh issue list --state all --limit 300 --json url --jq '.[].url' | while read -r url; do
-  gh project item-add "$NUM" --owner "$OWNER" --url "$url" >/dev/null 2>&1 || true
+  if ! gh project item-add "$NUM" --owner "$OWNER" --url "$url" >/dev/null 2>&1; then
+    sleep 3
+    gh project item-add "$NUM" --owner "$OWNER" --url "$url" >/dev/null 2>&1 \
+      || echo "  note: not added ($url) — already on the board, or add it by hand"
+  fi
 done
 
 PROJ_ID=$(gh project view "$NUM" --owner "$OWNER" --format json --jq .id)

@@ -153,11 +153,25 @@ Done when: the store text is ready to paste.'
 # --- wire the ready/blocked invariant ---------------------------------
 # Gate = the last-created issue of each milestone; the next milestone is
 # blocked by it. The first milestone is the ready set (with Start here).
-msnums() {
-  gh issue list --state all --milestone "$1" --limit 100 --json number --jq '.[].number'
+# GitHub's search index can lag a few seconds behind freshly created issues,
+# so every query retries on an empty result instead of wiring half a board.
+msnums() { # $1 = milestone — prints every issue number in it
+  tries=0
+  while :; do
+    out=$(gh issue list --state all --milestone "$1" --limit 100 --json number --jq '.[].number')
+    if [ -n "$out" ]; then break; fi
+    tries=$((tries + 1))
+    if [ "$tries" -ge 15 ]; then
+      echo "No issues visible for milestone '$1' (GitHub search lag?)" >&2
+      exit 1
+    fi
+    sleep 2
+  done
+  printf '%s\n' "$out"
 }
-gate() {
-  gh issue list --state all --milestone "$1" --limit 100 --json number --jq '.[0].number'
+gate() { # $1 = milestone — its highest issue number = the last issue created
+  nums=$(msnums "$1") || return 1
+  printf '%s\n' "$nums" | awk '{ if ($1 + 0 > m) m = $1 + 0 } END { print m }'
 }
 
 g0=$(gate "M0 — Setup & first window")
