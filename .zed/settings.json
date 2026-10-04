@@ -1,0 +1,14 @@
+// Project settings.
+//
+// This project is developed under a "no AI-made code or assets" rule: every
+// line of code and every asset is made by hand. Disable AI edit predictions
+// (inline completions) while working in this project — for every session that
+// opens this worktree, without changing your global settings.
+//
+// Chat and agent features are unaffected: AI is allowed to run the project
+// management and tutor in words (see AGENTS.md).
+{
+  "edit_predictions": {
+    "provider": "none"
+  }
+}

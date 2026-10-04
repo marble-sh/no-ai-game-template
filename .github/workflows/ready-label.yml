@@ -1,0 +1,25 @@
+# Clears the `ready` label the moment work starts on an issue.
+#
+# GitHub cannot trigger Actions from Projects v2 status changes (verified:
+# `projects_v2_item` is not a workflow trigger, and the default GITHUB_TOKEN
+# cannot read Projects at all). So the start-of-work signal is assignment:
+# assign yourself when you start a task and this removes `ready` if present.
+
+name: ready-label
+
+on:
+  issues:
+    types: [assigned]
+
+permissions:
+  issues: write
+
+jobs:
+  clear-ready:
+    runs-on: ubuntu-24.04
+    if: contains(github.event.issue.labels.*.name, 'ready')
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh issue edit ${{ github.event.issue.number }} --remove-label ready

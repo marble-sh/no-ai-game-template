@@ -1,0 +1,14 @@
+{
+  // This project is no-AI for code and assets — no AI code completions here.
+  "github.copilot.enable": { "*": false },
+  "github.copilot.nextEditSuggestions.enabled": false,
+  "editor.inlineSuggest.enabled": false,
+
+  // Format with the repo's .clang-format (C/C++ extension).
+  "C_Cpp.formatting": "clangFormat",
+  "C_Cpp.clang_format_style": "file",
+
+  // Match .editorconfig basics natively (VS Code doesn't read it without an extension).
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}

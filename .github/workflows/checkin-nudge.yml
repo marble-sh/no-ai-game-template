@@ -1,0 +1,44 @@
+# Daily timer: posts the check-in nudge on the pinned issue (#1).
+# The PM itself only runs when the user opens a session — this workflow is
+# the reminder half. It replaces its own previous comment to stay tidy.
+
+name: checkin-nudge
+
+on:
+  schedule:
+    - cron: "0 21 * * *" # 18:00 UTC-3 — adjust to your evening
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  nudge:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Post the nudge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          # Nothing to nudge until the backlog exists (scripts/setup-backlog.sh).
+          if ! gh issue view 1 --json number >/dev/null 2>&1; then
+            echo "Issue #1 does not exist yet — run scripts/setup-backlog.sh first. Skipping."
+            exit 0
+          fi
+
+          ready=$(gh issue list --state open --label ready --json number --jq 'length')
+          wip=$(gh issue list --state open --assignee "$OWNER" --json number --jq 'length')
+
+          # remove the previous nudge comment, if any
+          gh api "repos/$GH_REPO/issues/1/comments?per_page=100" \
+            --jq '.[] | select(.user.login == "github-actions[bot]") | select(.body | startswith("⏰")) | .id' |
+          while read -r id; do
+            gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
+          done
+
+          body=$(printf '⏰ **Daily check-in** — open your editor and say `checkin`. The PM reconciles the board and hands you the next action.\n\n_ready: %s · in progress: %s_' "$ready" "$wip")
+          gh issue comment 1 --body "$body"

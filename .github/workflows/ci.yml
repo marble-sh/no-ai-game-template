@@ -1,0 +1,65 @@
+# CI for the game — runs on every push (all branches) and by hand.
+#
+# Two gates:
+#   1. Build  — `make` must compile and link main.c against raylib.
+#   2. Smoke  — the window must open and stay alive headless for 10s.
+#
+# There is no test harness on purpose (PROJECT.md): until game logic moves
+# out of main.c, build + headless startup IS the honest regression gate.
+
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    name: Build + headless smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git xorg-dev libgl1-mesa-dev libgl1-mesa-dri libglx-mesa0 libasound2-dev xvfb
+
+      # The Makefile fetches and builds raylib itself; keep that work across
+      # runs. The key includes the Makefile hash, so bumping RAYLIB_VERSION
+      # (or any Makefile change) invalidates the cache.
+      - name: Cache fetched raylib
+        uses: actions/cache@v6
+        with:
+          path: external/raylib
+          key: raylib-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Makefile') }}
+
+      - name: Build
+        run: make
+
+      # A windowed game cannot be asserted frame-by-frame from CI; the
+      # honest runtime check is: it starts, it does not crash, it keeps
+      # running. timeout(1) exits 124 when it had to kill a live process —
+      # that is the pass condition; any other exit means the game died early.
+      - name: Smoke test (10s, headless via Xvfb)
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          set +e
+          timeout 10 xvfb-run -a ./game
+          status=$?
+          set -e
+          if [ "$status" -ne 124 ]; then
+            echo "::error::game exited before the 10s timeout (status $status) — it must run until closed"
+            exit 1
+          fi
+          echo "OK: game was still running after 10 seconds."

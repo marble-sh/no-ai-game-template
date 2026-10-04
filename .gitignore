@@ -1,0 +1,6 @@
+game
+external/
+*.o
+
+# Global gitignores often hide AGENTS.md; this template ships it deliberately.
+!AGENTS.md

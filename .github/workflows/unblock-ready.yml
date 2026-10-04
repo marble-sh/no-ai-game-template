@@ -1,0 +1,66 @@
+# Keeps the ready/blocked invariant true: when an issue closes, any issue it
+# was blocking that now has ALL blockers closed gets the `ready` label.
+# Fires on close events, plus a daily sweep as a safety net (and manually).
+
+name: unblock-ready
+
+on:
+  issues:
+    types: [closed]
+  schedule:
+    - cron: "30 11 * * *" # daily safety net
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  ready-unblocked:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Label newly unblocked issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          CLOSED_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -uo pipefail
+
+          candidates() {
+            if [ "$EVENT" = "issues" ]; then
+              gh api "repos/$GH_REPO/issues/$CLOSED_NUMBER/dependencies/blocking" --jq '.[].number'
+            else
+              gh issue list --state open --limit 200 --json number --jq '.[].number'
+            fi
+          }
+
+          changed=0
+          for n in $(candidates); do
+            state=$(gh issue view "$n" --json state --jq .state)
+            [ "$state" = "OPEN" ] || continue
+
+            labels=$(gh issue view "$n" --json labels --jq '[.labels[].name] | join(",")')
+            case ",$labels," in
+              *,ready,*) continue ;;
+            esac
+
+            states=$(gh api "repos/$GH_REPO/issues/$n/dependencies/blocked_by" --jq '[.[].state] | join(" ")')
+            [ -n "$states" ] || continue
+
+            all_closed=1
+            for s in $states; do
+              [ "$s" = "closed" ] || all_closed=0
+            done
+
+            if [ "$all_closed" = "1" ]; then
+              if gh issue edit "$n" --add-label ready >/dev/null 2>&1; then
+                echo "#$n -> ready (all blockers closed)"
+                changed=$((changed + 1))
+              else
+                echo "#$n: failed to add the label"
+              fi
+            fi
+          done
+          echo "sweep complete — $changed issue(s) labeled ready"
