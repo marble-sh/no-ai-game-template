@@ -153,6 +153,10 @@ enable `exrc`) — `EDITORS.md` covers each editor and keeps AI completions off.
 take the first ticket from the board, or open your AI assistant and say **`checkin`** —
 it hands you exactly one next action.
 
+On that first session the AI also asks one onboarding question: keep the shipped
+C17 + raylib layout, or switch the project to another language/framework. Either
+answer keeps the backlog intact — the layout is only a starting point.
+
 Optional: the wiki needs one manual first page (the **Wiki** tab → *Create the first
 page*) before `sh scripts/wiki-sync.sh` can publish the seeded Dev log / Lessons pages.
 

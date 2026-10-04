@@ -2,6 +2,7 @@
 
 Working title: _to be decided_
 Pitch: _one sentence, your words_
+Setup choice: _not chosen yet — the AI asks once at first run: keep C17 + raylib, or switch?_
 
 Goal: a small desktop game, written in C with raylib, sellable for a few dollars.
 Ports only if the finished game earns them.
