@@ -1,4 +1,5 @@
-# CI for the game — runs on every push (all branches) and by hand.
+# CI for the game — runs on every push (all branches), on every ticket closed
+# as completed (the regression gate for finished work), and by hand.
 #
 # Two gates:
 #   1. Build  — `make` must compile and link main.c against raylib.
@@ -12,6 +13,8 @@ name: CI
 on:
   push:
   workflow_dispatch:
+  issues:
+    types: [closed]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,6 +28,11 @@ jobs:
     name: Build + headless smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    # Issue-close runs are the per-ticket regression gate; skip "not planned"
+    # closes. Push and manual runs always execute.
+    if: >-
+      github.event_name != 'issues' ||
+      github.event.issue.state_reason == 'completed'
 
     steps:
       - uses: actions/checkout@v5

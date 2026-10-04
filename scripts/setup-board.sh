@@ -101,3 +101,6 @@ echo "  - Sort order, board grouping and the roadmap date field are UI-only sett
 echo "    set them once in the view menus (sort 'Next up' by Due, group 'This milestone'"
 echo "    by Status, timeline date field = Due) and they persist."
 echo "  - 'This milestone' filters on M0 — update the filter when you move milestones."
+echo "  - Built-in project workflows (UI-only, enable once): 'Auto-add to project' with"
+echo "    the filter 'is:issue is:open', 'Item closed -> Status: Done', and"
+echo "    'Item reopened -> Status: Todo' so the board tracks issue state by itself."

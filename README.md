@@ -28,9 +28,11 @@ off for Zed, VS Code, Vim/Neovim, and Emacs.
 - **Backlog helpers** — `scripts/setup-backlog.sh` creates labels, milestones and a
   starter issue set; `scripts/setup-board.sh` creates the project board with
   Priority + Due fields, four focused views, and the ready/blocked flow.
-- **Automation** — `ready` clears itself when you assign yourself; issues become
-  ready automatically when their blockers close; a daily check-in nudge and a
-  Friday standup digest land on the pinned issue.
+- **Automation** — `ready` clears when you assign yourself (and returns if you
+  unassign); completing a ticket re-runs the regression gate and auto-assigns the
+  next ready ticket (WIP 1 permitting); issues become ready automatically when
+  their blockers close; a daily check-in nudge and a Friday standup digest land on
+  the pinned issue.
 - **Agent rules** — `AGENTS.md` (+ `CLAUDE.md`) and `.github/copilot-instructions.md`.
 - **Editor setup** — `.zed/`, `.vscode/`, `.exrc`, `.dir-locals.el` (AI off),
   `.editorconfig`, `.clang-format`, and a pre-commit format hook (`EDITORS.md`
@@ -56,7 +58,13 @@ off for Zed, VS Code, Vim/Neovim, and Emacs.
 - Open a session and say **`checkin`** — the PM reconciles the board and hands you
   one next action.
 - Start a task by **assigning yourself**: the `ready` label clears automatically.
+- Finish a task by **closing it as completed** — regression re-runs and the next
+  ready ticket is assigned to you automatically (unless you still hold open work).
+- Unassign a ticket to put it back in the ready set.
 - Every open issue is either `ready` or *Is blocked by* another issue — nothing in between.
+- **Priorities and due dates** (P1 = ready/next up, P2 = next milestone, P3 = later;
+  soft, sized to your real hours) are the PM's upkeep — ask any time; they are re-tuned
+  at check-ins and standups.
 - Friday: say **`standup`** for the weekly review; the PM re-orders next week's
   short-list and re-dates the ready items.
 

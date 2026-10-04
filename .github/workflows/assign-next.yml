@@ -1,0 +1,78 @@
+# When you complete a ticket, hand you the next one — automatically.
+#
+# Board events cannot trigger Actions (Projects v2 items are not a workflow
+# trigger, and GITHUB_TOKEN cannot read Projects), so "done" means: the issue
+# was closed as *completed*. This workflow then picks the first unassigned
+# ticket in the ready set (= P1 by convention; oldest first, the top of the
+# Next up view) and assigns it to whoever closed the ticket — unless they
+# still hold WIP (another open assigned issue), in which case it only says so.
+#
+# The `ready` label is removed in the same edit on purpose: events created with
+# GITHUB_TOKEN do not re-trigger workflows, so ready-label.yml would never see
+# this assignment.
+
+name: assign-next
+
+on:
+  issues:
+    types: [closed]
+
+concurrency:
+  group: assign-next
+  cancel-in-progress: false
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  hand-over:
+    runs-on: ubuntu-24.04
+    if: >-
+      github.event.issue.state_reason == 'completed' &&
+      github.event.sender.type != 'Bot'
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      ACTOR: ${{ github.event.sender.login }}
+      CLOSED: ${{ github.event.issue.number }}
+    steps:
+      - name: Check WIP 1
+        id: wip
+        run: |
+          set -uo pipefail
+          busy=$(gh issue list --state open --assignee "$ACTOR" --json number \
+            --jq '[.[] | "#\(.number)"] | join(", ")')
+          echo "busy=$busy" >> "$GITHUB_OUTPUT"
+
+      - name: Assign the next ready ticket
+        if: steps.wip.outputs.busy == ''
+        run: |
+          set -uo pipefail
+          # A milestone gate may be unwinding right now (unblock-ready runs in
+          # parallel and labels the next milestone), so retry for ~75s before
+          # concluding there is nothing to pick up.
+          next=""
+          for i in 1 2 3 4 5 6; do
+            next=$(gh issue list --state open --label ready --limit 100 \
+              --json number,assignees \
+              --jq '[.[] | select(.assignees | length == 0)] | sort_by(.number) | .[0].number // empty')
+            [ -n "$next" ] && break
+            sleep 15
+          done
+
+          if [ -n "$next" ]; then
+            gh issue edit "$next" --add-assignee "$ACTOR" --remove-label ready
+            gh issue comment "$CLOSED" \
+              --body "✅ **Next up: #$next** — auto-assigned to @$ACTOR (first unassigned ticket in the ready set)."
+          else
+            gh issue comment "$CLOSED" \
+              --body "No unassigned \`ready\` ticket to pick up right now — check the board's **Next up** view (a gate may still be unwinding)."
+          fi
+
+      - name: Note the WIP hold
+        if: steps.wip.outputs.busy != ''
+        run: |
+          gh issue comment "$CLOSED" \
+            --body "You still have open assigned work (${{ steps.wip.outputs.busy }}) — WIP 1, so nothing was auto-assigned."

@@ -24,8 +24,11 @@ Words and diagrams are fine. Code and assets are not.
 
 Backlog, board, check-ins and standup are handled by the author's project
 manager (an AI assistant) under the rules in `PROJECT.md`. That lane produces
-docs, labels, issues and board updates only — never code, never assets. Other
-agents do not touch the backlog either.
+docs, labels, issues and board updates only — never code, never assets. Its
+standing duties include the **Priority** (P1 = ready/next up, P2 = next
+milestone, P3 = later) and **Due** fields for ready work; another agent may
+update those two fields only when the user asks. Other agents do not touch the
+backlog otherwise.
 
 ## Living with this repo
 

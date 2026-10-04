@@ -26,17 +26,24 @@ user's PM assistant — work with that system, do not duplicate it.
 - A game in C17 + raylib; this template ships a minimal starter (`main.c`, `Makefile`).
 - `make` fetches the pinned raylib and builds `./game`; `make run` launches it.
   No CMake, no test framework — deliberate; do not propose migrations.
-- CI runs on every push: compile + a 10-second headless smoke test.
+- CI runs on every push and on every ticket closed as completed: compile + a
+  10-second headless smoke test.
 - Game design lives in `PROJECT.md` (how the team works) and `IDEAS.md` (scored idea
   ledger); new mechanics go there first.
 
 ## How work happens (follow the board)
 
 - One issue at a time (WIP 1); the current task is the issue the user is assigned to.
+- Completed tickets auto-hand over: closing one assigns the next ready ticket to the
+  user (unless they still hold open work); unassigning a ticket makes it `ready` again.
 - Help within the current issue's scope; its "Done when" line is the finish line.
 - You may leave a comment on the issue (explanation, review, what to try next) — the PM
-  reads those at check-ins. Never touch labels, milestones, project fields, or other
-  backlog machinery.
+  reads those at check-ins. Leave labels, milestones and blocked-by links to the
+  automation and the PM. **Priorities and due dates are shared stewardship**: when the
+  user asks — or when they change their plan — keep the board's Priority (P1 = ready/next
+  up, P2 = next milestone, P3 = later) and Due fields truthful for the tickets involved
+  (`gh project item-edit` / `gh project item-list`). Do not churn fields another session
+  just set.
 - Commits are made **by the user**; the house style is a small message prefixed with
   the task id — example: `M1.1: make input count`.
 

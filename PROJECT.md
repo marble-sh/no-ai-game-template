@@ -29,6 +29,10 @@ rules for AI tools live in `AGENTS.md`.
   Nothing sits unclassified.
 - **Assign yourself to start.** Assigning an issue removes its `ready` label
   automatically. Due dates are soft targets, re-tuned at every check-in — not promises.
+- **Finish by closing the issue as *completed*.** If nothing else is assigned, the
+  first ticket in the ready set is auto-assigned to you, and the regression gate
+  (build + headless smoke) re-runs on the latest code. Unassigning a ticket puts it
+  back in the ready set.
 - A task you cannot finish in two evenings is too big — say so at a check-in and
   it will be cut down.
 
@@ -54,6 +58,22 @@ and asks:
 Then it massages the backlog: rolls the milestone gates (Ready set, Priorities),
 re-dates ready items against your real hours, splits oversized tasks, and records
 decisions on the relevant issues.
+
+## Automations (already wired — nothing to install)
+
+- Assign → `ready` clears. Unassign (or re-open with nobody on it) → `ready` comes
+  back, blockers permitting. A daily sweep readies tickets whose blockers all closed;
+  a ticket someone holds is never re-marked ready.
+- Close as *completed* → regression runs on the default branch, and the first
+  unassigned `ready` ticket (top of the Next up view) is auto-assigned to you —
+  skipped with a note while you still hold open work (WIP 1).
+- **Priority & due dates** are the PM's stewardship: P1 = ready/next up, P2 = next
+  milestone, P3 = later; ready items carry soft due dates sized to ~5 h/week, re-tuned
+  at every check-in and standup. Another AI assistant may adjust them only when you
+  ask it to.
+- One-time clicks in the project UI (there is no API for these): enable the built-in
+  workflows *Auto-add to project* (filter `is:issue is:open`), *Item closed → Status:
+  Done* and *Item reopened → Status: Todo*; sort the *Next up* view by Priority, then Due.
 
 ## Time budget (starting assumption — calibrate at the first standup)
 

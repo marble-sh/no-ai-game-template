@@ -46,6 +46,10 @@ jobs:
               *,ready,*) continue ;;
             esac
 
+            # Never re-ready something someone is already on (WIP 1).
+            held=$(gh issue view "$n" --json assignees --jq '.assignees | length')
+            [ "$held" = "0" ] || continue
+
             states=$(gh api "repos/$GH_REPO/issues/$n/dependencies/blocked_by" --jq '[.[].state] | join(" ")')
             [ -n "$states" ] || continue
 

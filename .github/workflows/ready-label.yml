@@ -1,25 +1,60 @@
-# Clears the `ready` label the moment work starts on an issue.
+# Keeps `ready` honest on both edges of starting or pausing work.
 #
 # GitHub cannot trigger Actions from Projects v2 status changes (verified:
 # `projects_v2_item` is not a workflow trigger, and the default GITHUB_TOKEN
-# cannot read Projects at all). So the start-of-work signal is assignment:
-# assign yourself when you start a task and this removes `ready` if present.
+# cannot read Projects at all). So the signals are assignment:
+#   assigned    — work started: clear `ready`
+#   unassigned  — work paused: restore `ready`, but only if every blocker is
+#                 already closed (no blockers recorded = it was ready before)
+#   reopened    — if nobody holds it, the same as unassigned
+#
+# Assignments made by the assign-next workflow carry no event here (events
+# created with GITHUB_TOKEN never re-trigger workflows) — that workflow
+# removes `ready` itself.
 
 name: ready-label
 
 on:
   issues:
-    types: [assigned]
+    types: [assigned, unassigned, reopened]
 
 permissions:
   issues: write
 
 jobs:
-  clear-ready:
+  sync-ready:
     runs-on: ubuntu-24.04
-    if: contains(github.event.issue.labels.*.name, 'ready')
     steps:
-      - env:
+      - name: Sync the ready label
+        env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh issue edit ${{ github.event.issue.number }} --remove-label ready
+          ACTION: ${{ github.event.action }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+          HAS_ASSIGNEES: ${{ github.event.issue.assignees[0] != null }}
+        run: |
+          set -uo pipefail
+
+          case "$ACTION" in
+            assigned)
+              case ",$LABELS," in
+                *,ready,*) gh issue edit "$NUMBER" --remove-label ready ;;
+              esac
+              ;;
+            unassigned|reopened)
+              [ "$HAS_ASSIGNEES" = "true" ] && exit 0
+              case ",$LABELS," in
+                *,ready,*) exit 0 ;;
+              esac
+              states=$(gh api "repos/$GH_REPO/issues/$NUMBER/dependencies/blocked_by" \
+                --jq '.[].state' | tr '\n' ' ')
+              all_closed=1
+              for s in $states; do
+                [ "$s" = "closed" ] || all_closed=0
+              done
+              if [ "$all_closed" = "1" ]; then
+                gh issue edit "$NUMBER" --add-label ready
+              fi
+              ;;
+          esac
