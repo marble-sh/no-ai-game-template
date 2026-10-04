@@ -43,21 +43,118 @@ off for Zed, VS Code, Vim/Neovim, and Emacs.
 
 ## Quickstart
 
-1. **Create a repo from this template** — *Use this template* → *Create a new
-   repository*, or:
-   `gh repo create my-game --public --template <owner>/no-ai-game-template`.
-2. **Seed the plan** (needs `gh` with the `project` scope — `gh auth refresh -s project`):
+From “generated from this template” to “first window on screen, backlog live” —
+ten minutes of setup, plus the first raylib build.
 
-       sh scripts/setup-backlog.sh
-       sh scripts/setup-board.sh
+### 1. Install the tools (once per machine)
 
-   The first script also enables the shipped pre-commit format hook for your
-   clone (`core.hooksPath=.githooks`) — staged C files are clang-formatted on
-   every commit.
+You need: `git`, a C toolchain (`gcc` or `clang`) with `make`, [`gh`](https://cli.github.com)
+for the board scripts, and `clang-format` for the commit hook.
 
-3. **Open it in your editor.** Accept the trust prompts once (Zed / Emacs). If you
-   use Vim/Neovim, enable `exrc` to pick up the AI-off settings.
-4. `make run` — get a window on screen, then start your first issue.
+**Linux — Debian/Ubuntu**
+
+```sh
+sudo apt update
+sudo apt install -y build-essential git gh clang-format
+sudo apt install -y xorg-dev libgl1-mesa-dev libasound2-dev   # raylib build deps
+```
+
+**Linux — Fedora**
+
+```sh
+sudo dnf install -y gcc make git gh clang-tools-extra
+sudo dnf install -y alsa-lib-devel mesa-libGL-devel libX11-devel libXrandr-devel libXi-devel libXcursor-devel libXinerama-devel
+```
+
+**Linux — Arch**
+
+```sh
+sudo pacman -S --needed base-devel git gh clang alsa-lib mesa libx11 libxrandr libxi libxcursor libxinerama
+```
+
+**macOS**
+
+```sh
+xcode-select --install         # clang + make (git comes with it)
+brew install gh clang-format
+```
+
+**Windows — recommended: WSL2 (Ubuntu)**
+
+WSL runs the same environment the project's CI uses, and windows appear through WSLg
+on Windows 11 / updated Windows 10.
+
+```sh
+wsl --install -d Ubuntu        # PowerShell, once; reboot if it asks
+```
+
+Then open Ubuntu and run the Debian/Ubuntu list above. Keep the repo inside the Linux
+home (`~/code/...`), not under `/mnt/c` — builds are much faster there.
+
+**Windows — native (MSYS2)**
+
+Works, with two wrinkles: run everything from the MSYS2 **UCRT64** shell (PowerShell
+and cmd can't run the Makefile's shell steps or the setup scripts), and install `gh`
+and LLVM on the Windows side.
+
+```sh
+# install MSYS2 from msys2.org, open the "UCRT64" shell, then:
+pacman -S --needed git make mingw-w64-ucrt-x86_64-gcc
+# gh + clang-format — in PowerShell (reopen the MSYS2 shell afterwards):
+#   winget install GitHub.cli
+#   winget install LLVM.LLVM
+```
+
+### 2. Authenticate GitHub
+
+```sh
+gh auth login                  # SSH or HTTPS — it can upload a key or set up git credentials
+gh auth refresh -s project     # the board script needs the "project" scope
+```
+
+Check `gh --version` — the backlog scripts need a recent `gh` (2.89+) for the
+issue-dependency flags.
+
+### 3. Create your repo from the template, and clone it
+
+On GitHub: **Use this template** → **Create a new repository**, then clone it.
+Or all at once from the CLI:
+
+```sh
+gh repo create my-game --template <owner>/no-ai-game-template --private --clone
+cd my-game
+```
+
+### 4. Seed the plan (from the repo root)
+
+```sh
+sh scripts/setup-backlog.sh    # labels, milestones, starter issues, pinned “Start here”
+sh scripts/setup-board.sh      # project board: Priority + Due fields and four views
+```
+
+The first script also enables the shipped pre-commit format hook for your clone
+(`core.hooksPath=.githooks`) — staged C files are clang-formatted on every commit.
+
+Then, once, in the project UI — **⋯ → Workflows** (GitHub has no API for these):
+*Auto-add to project* with filter `is:issue is:open`, *Item closed → Status: Done*,
+*Item reopened → Status: Todo*.
+
+### 5. Build and run
+
+```sh
+make          # first run downloads and builds raylib (a few minutes, needs network)
+make run      # a window opens; close it with ESC
+```
+
+### 6. Start working
+
+Open the repo in your editor and accept the trust prompt once (Vim/Neovim users:
+enable `exrc`) — `EDITORS.md` covers each editor and keeps AI completions off. Then
+take the first ticket from the board, or open your AI assistant and say **`checkin`** —
+it hands you exactly one next action.
+
+Optional: the wiki needs one manual first page (the **Wiki** tab → *Create the first
+page*) before `sh scripts/wiki-sync.sh` can publish the seeded Dev log / Lessons pages.
 
 ## How a session looks
 

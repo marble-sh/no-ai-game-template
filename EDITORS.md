@@ -49,8 +49,9 @@ configuration, add it here.
 
 The spec lives in **`.clang-format`** (Allman braces, 4-space indent, 80 columns,
 aligned consecutive assignments). Tool of choice: **clang-format** (fast single
-binary, understood by every editor above); install with
-`sudo apt install clang-format` or `pacman -S clang`.
+binary, understood by every editor above); install with `sudo apt install clang-format`
+(Debian/Ubuntu), `sudo dnf install clang-tools-extra` (Fedora), `sudo pacman -S clang`
+(Arch), `brew install clang-format` (macOS) or `winget install LLVM.LLVM` (Windows).
 
 - **`.editorconfig`** — indentation/newlines for editors that support it
   (Zed, Vim, Emacs, JetBrains read it natively; VS Code needs the EditorConfig
