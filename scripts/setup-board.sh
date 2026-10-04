@@ -81,7 +81,11 @@ done
 
 echo "Setting priorities (P1 = ready, P2 = next milestone, P3 = the rest) ..."
 pri() {
-  gh project item-edit "$NUM" --owner "$OWNER" --url "$1" --field "Priority" --value "$2" >/dev/null 2>&1 || true
+  if ! gh project item-edit "$NUM" --owner "$OWNER" --url "$1" --field "Priority" --value "$2" >/dev/null 2>&1; then
+    sleep 5
+    gh project item-edit "$NUM" --owner "$OWNER" --url "$1" --field "Priority" --value "$2" >/dev/null 2>&1 \
+      || echo "  note: could not set Priority=$2 on $1 — set it in the project UI"
+  fi
   sleep 1
 }
 gh issue list --state open --label ready --json url --jq '.[].url' | while read -r u; do pri "$u" P1; done
