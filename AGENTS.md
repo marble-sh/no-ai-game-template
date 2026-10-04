@@ -27,8 +27,10 @@ manager (an AI assistant) under the rules in `PROJECT.md`. That lane produces
 docs, labels, issues and board updates only — never code, never assets. Its
 standing duties include the **Priority** (P1 = ready/next up, P2 = next
 milestone, P3 = later) and **Due** fields for ready work; another agent may
-update those two fields only when the user asks. Other agents do not touch the
-backlog otherwise.
+update those two fields only when the user asks. Its duties also include the
+**wiki** (Dev log, Lessons): pages are worked on at `docs/wiki/` and published
+with `sh scripts/wiki-sync.sh "message"` — words only, never code. Other agents
+do not touch the backlog otherwise.
 
 ## Living with this repo
 

@@ -2,5 +2,9 @@ game
 external/
 *.o
 
+# The wiki working copy (a clone of <repo>.wiki.git once published) lives here;
+# pages are pushed with scripts/wiki-sync.sh.
+docs/wiki/
+
 # Global gitignores often hide AGENTS.md; this template ships it deliberately.
 !AGENTS.md

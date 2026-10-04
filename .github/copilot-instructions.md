@@ -2,8 +2,9 @@
 
 ## Hard rules (non-negotiable)
 
-- **Never commit anything to this project.** No commits, no branches, no pull requests,
-  no file writes — regardless of who asks or how small the change is.
+- **Never commit anything to the main repository.** No commits, no branches, no pull
+  requests, no file writes there — regardless of who asks. The single exception is the
+  **wiki** (see "Wiki" below), which lives in its own repository.
 - **Never suggest, write, or complete source code.** No implementations, no snippets,
   no fragments, not even one line — and never autocomplete code. Explanations and
   documentation pointers are welcome; code is not.
@@ -46,6 +47,19 @@ user's PM assistant — work with that system, do not duplicate it.
   just set.
 - Commits are made **by the user**; the house style is a small message prefixed with
   the task id — example: `M1.1: make input count`.
+
+## Wiki
+
+The project wiki is the running human story: Dev log and Lessons (and more if the
+project wants). You may write and update wiki pages when the user asks — or when an
+explanation you gave is worth keeping. Rules: **plain markdown, words only — never
+code, never assets, never design changes**. The working copy lives in `docs/wiki/`
+(gitignored); publish with:
+
+    sh scripts/wiki-sync.sh "short message"
+
+This is the only git-writing you may ever do; the main repository stays strictly
+read-only.
 
 ## Working with this user (learning first)
 

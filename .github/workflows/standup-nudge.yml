@@ -40,5 +40,5 @@ jobs:
             gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
           done
 
-          body=$(printf '🗓 **Standup Friday** — open your editor and say `standup`.\n\n_moved this week: %s · ready: %s · in progress: %s_' "$moved" "$ready" "$wip")
+          body=$(printf '🗓 **Standup Friday** — open your editor and say `standup`. The PM re-tunes the board and folds the week into the wiki.\n\n_moved this week: %s · ready: %s · in progress: %s_' "$moved" "$ready" "$wip")
           gh issue comment 1 --body "$body"

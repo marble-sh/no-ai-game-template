@@ -33,6 +33,8 @@ off for Zed, VS Code, Vim/Neovim, and Emacs.
   next ready ticket (WIP 1 permitting); issues become ready automatically when
   their blockers close; a daily check-in nudge and a Friday standup digest land on
   the pinned issue.
+- **Wiki upkeep** — the AI keeps a running wiki (Dev log, Lessons): pages live in
+  `docs/wiki/` and publish with `sh scripts/wiki-sync.sh "message"`.
 - **Agent rules** — `AGENTS.md` (+ `CLAUDE.md`) and `.github/copilot-instructions.md`.
 - **Editor setup** — `.zed/`, `.vscode/`, `.exrc`, `.dir-locals.el` (AI off),
   `.editorconfig`, `.clang-format`, and a pre-commit format hook (`EDITORS.md`
@@ -69,6 +71,8 @@ off for Zed, VS Code, Vim/Neovim, and Emacs.
 - **Priorities and due dates** (P1 = ready/next up, P2 = next milestone, P3 = later;
   soft, sized to your real hours) are the PM's upkeep — ask any time; they are re-tuned
   at check-ins and standups.
+- The **wiki** stays current too: ask to see it, or edit pages yourself under
+  `docs/wiki/` and publish with the sync script.
 - Friday: say **`standup`** for the weekly review; the PM re-orders next week's
   short-list and re-dates the ready items.
 

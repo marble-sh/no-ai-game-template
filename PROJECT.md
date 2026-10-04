@@ -74,6 +74,9 @@ decisions on the relevant issues.
 - One-time clicks in the project UI (there is no API for these): enable the built-in
   workflows *Auto-add to project* (filter `is:issue is:open`), *Item closed → Status:
   Done* and *Item reopened → Status: Todo*; sort the *Next up* view by Priority, then Due.
+- **The wiki** keeps the human-readable story (Dev log, Lessons): pages are worked on
+  at `docs/wiki/` and published with `sh scripts/wiki-sync.sh "message"`. It is
+  refreshed at every check-in and standup. Words only — the wiki never carries code.
 
 ## Time budget (starting assumption — calibrate at the first standup)
 
