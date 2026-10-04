@@ -33,13 +33,6 @@ PROJ_ID=$(gh project view "$NUM" --owner "$OWNER" --format json --jq .id)
 PRI_ID=$(gh project field-list "$NUM" --owner "$OWNER" --format json --jq '.fields[] | select(.name=="Priority") | .id')
 DUE_ID=$(gh project field-list "$NUM" --owner "$OWNER" --format json --jq '.fields[] | select(.name=="Due") | .id')
 
-echo "Removing the default placeholder views ..."
-gh api graphql -f query="query { node(id: \"$PROJ_ID\") { ... on ProjectV2 { views(first: 20) { nodes { id name } } } } }" \
-  --jq '.data.node.views.nodes[] | select(.name | test("^View [0-9]+$")) | .id' |
-while read -r vid; do
-  gh api graphql -f query="mutation { deleteProjectV2View(input: {viewId: \"$vid\"}) { clientMutationId } }" >/dev/null 2>&1 || true
-done
-
 echo "Creating views ..."
 
 new_view() { # $1 name, $2 layout, $3 filter, $4 visible fields (space-separated tokens: PRI DUE)
@@ -68,6 +61,18 @@ new_view "Next up" TABLE_LAYOUT "label:ready is:open" "PRI DUE"
 new_view "Doing now" TABLE_LAYOUT "status:\"In Progress\"" "PRI DUE"
 new_view "This milestone" BOARD_LAYOUT "milestone:\"M0 — Setup & first window\" is:open" "PRI DUE"
 new_view "Timeline" ROADMAP_LAYOUT "is:open" ""
+
+# GitHub materializes a default "View 1" shortly AFTER project creation — sweep
+# once our views exist and the defaults have had a moment to show up.
+echo "Removing default placeholder views ..."
+sleep 3
+gh api graphql -f query="query { node(id: \"$PROJ_ID\") { ... on ProjectV2 { views(first: 20) { nodes { id name } } } } }" \
+  --jq '.data.node.views.nodes[] | select(.name | test("^View [0-9]+$")) | .id' |
+while read -r vid; do
+  if gh api graphql -f query="mutation { deleteProjectV2View(input: {viewId: \"$vid\"}) { projectV2View { id } } }" >/dev/null 2>&1; then
+    echo "  removed a default view"
+  fi
+done
 
 echo "Setting priorities (P1 = ready, P2 = next milestone, P3 = the rest) ..."
 pri() {
