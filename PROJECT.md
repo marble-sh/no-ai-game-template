@@ -4,12 +4,14 @@ Working title: _to be decided_
 Pitch: _one sentence, your words_
 Setup choice: _not chosen yet — the AI asks once at first run: keep C17 + raylib, or switch?_
 
-Goal: a small desktop game, written in C with raylib, sellable for a few dollars.
+Goal: a small desktop game, written in C with raylib.
+
 Ports only if the finished game earns them.
 
-**No AI-made code or assets.** You write every line; you make or hand-pick every
-asset. AI runs the project management only — backlog, check-ins, standup. The
-rules for AI tools live in `AGENTS.md`.
+**No AI-made code, assets, or writing.** You write every line of code, you make or
+hand-pick every asset, and you write the game's story, dialogue and text yourself.
+AI runs the project management only — backlog, check-ins, standup. The rules for AI
+tools live in `AGENTS.md`.
 
 ## Build
 

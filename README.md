@@ -1,21 +1,24 @@
 # no-ai-game-template
 
-A simple template repository for a **0-AI game**: nothing in your game is
-AI-programmed, AI-developed, or AI-generated — with one deliberate exception.
-**AI only does the project management and standup tasks to keep you on track.
-Nothing else.**
+A simple template repository for a **0-AI game**: nothing in your game — code,
+assets, or words — is AI-programmed, AI-developed, or AI-generated, with one
+deliberate exception. **AI only does the project management and standup tasks to
+keep you on track. Nothing else.**
 
 Your AI assistant runs your backlog, your check-ins and your weekly standup: it
 keeps one task in front of you, keeps the board honest, and hands you the next
-action. It never writes code. It never makes assets. That is the whole job.
+action. It never writes code. It never makes assets. It never writes the game.
+That is the whole job.
 
 ## The rule
 
 - **You write every line of code.** No AI suggestions, completions, or "just a snippet".
 - **You make every asset** (or hand-pick assets made by people). No AI images, audio,
   fonts, or "placeholder generation".
+- **You write every word of the game.** Story, dialogue, characters, in-game text,
+  store blurbs — no AI drafts, suggestions, or rewrites, not even one line.
 - **AI manages the project only:** issues, priorities, blockers, due dates, check-ins,
-  standup. It talks; you build.
+  standup. It talks; you build — and you write.
 
 The repo ships the enforcement, so the rule is more than a promise: `AGENTS.md` binds
 every AI tool that opens the repository, and editor configs turn AI code completions

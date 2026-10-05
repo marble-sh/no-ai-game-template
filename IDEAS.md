@@ -34,5 +34,7 @@ idea needs in the abstract.
 ## Notes
 
 - Re-score ideas at standups — F values drift as you level up.
+- Ideas and every word of the game are yours: the PM records and scores them, and
+  never drafts story, dialogue or game text for you.
 - When an idea is accepted, its row changes to `accepted — issues #…` and the
   breakdown lives on the board, not here.
